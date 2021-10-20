@@ -51,11 +51,6 @@ spec:
             secretKeyRef:
               key: auth.service.certificate
               name: services-certification-keys
-        - name: vault.k8s.role
-          valueFrom:
-            configMapKeyRef:
-              key: vault.k8s.role
-              name: read-only-role
         image: registry.blabla.com/auth-server:5.1.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
