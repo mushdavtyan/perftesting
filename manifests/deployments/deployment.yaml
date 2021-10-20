@@ -33,10 +33,6 @@ spec:
               name: services-certification-keys
         image: nginx
         imagePullPolicy: IfNotPresent
-          initialDelaySeconds: 90
-          periodSeconds: 20
-          successThreshold: 1
-          timeoutSeconds: 10
         name: authservice-v1
         ports:
         - containerPort: 80
