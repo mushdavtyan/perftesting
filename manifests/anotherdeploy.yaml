@@ -20,7 +20,7 @@ spec:
         app: authservice
     spec:
       containers:
-        image: nginx:latest
+      - image: nginx:latest
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 7
