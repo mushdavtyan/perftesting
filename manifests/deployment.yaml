@@ -56,7 +56,7 @@ spec:
             configMapKeyRef:
               key: vault.k8s.role
               name: read-only-role
-        image: regdb.synisys.com/com.synisys.idm/auth-server:5.1.0
+        image: registry.blabla.com/auth-server:5.1.0
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 7
