@@ -1,0 +1,101 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    artifact.spinnaker.io/location: perftesting
+    artifact.spinnaker.io/name: authservice-v1
+    artifact.spinnaker.io/type: kubernetes/deployment
+    deployment.kubernetes.io/revision: "44"
+    moniker.spinnaker.io/application: authservice
+    moniker.spinnaker.io/cluster: deployment authservice-v1
+  labels:
+    app: authservice
+    app.kubernetes.io/managed-by: spinnaker
+    app.kubernetes.io/name: authservice
+    load-balancer-authservice-v1: "true"
+  name: authservice-v1
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: authservice
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        artifact.spinnaker.io/location: perftesting
+        artifact.spinnaker.io/name: authservice-v1
+        artifact.spinnaker.io/type: kubernetes/deployment
+        moniker.spinnaker.io/application: authservice
+        moniker.spinnaker.io/cluster: deployment authservice-v1
+      creationTimestamp: null
+      labels:
+        app: authservice
+        app.kubernetes.io/managed-by: spinnaker
+        app.kubernetes.io/name: authservice
+        load-balancer-authservice-v1: "true"
+    spec:
+      containers:
+      - env:
+        - name: JAVA_OPTS
+          value: -Dvault.addr= -Dservice.environment=perftesting -Dconsul.host=consul-dev.synisys.com
+            -Dconsul.port=80 -Dlogging.level.org.springframework.jdbc.core.JdbcTemplate=ERROR
+            -Dendpoints.enabled=false -Dendpoints.health.enabled=true -Dendpoints.metrics.enabled=true
+        - name: certificateKey
+          valueFrom:
+            secretKeyRef:
+              key: auth.service.certificate
+              name: services-certification-keys
+        - name: vault.k8s.role
+          valueFrom:
+            configMapKeyRef:
+              key: vault.k8s.role
+              name: read-only-role
+        image: regdb.synisys.com/com.synisys.idm/auth-server:5.1.0
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 7
+          httpGet:
+            path: /health
+            port: 8899
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        name: authservice-v1
+        ports:
+        - containerPort: 8899
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /health
+            port: 8899
+            scheme: HTTP
+          initialDelaySeconds: 90
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 10
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        terminationMessagePath: /dev/termination-log
+      imagePullSecrets:
+      - name: regdb.synisys.com
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: vault
+      serviceAccountName: vault
+      terminationGracePeriodSeconds: 30
