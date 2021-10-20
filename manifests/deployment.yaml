@@ -51,13 +51,13 @@ spec:
             secretKeyRef:
               key: auth.service.certificate
               name: services-certification-keys
-        image: registry.blabla.com/auth-server:5.1.0
+        image: nginx
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 7
           httpGet:
             path: /health
-            port: 8899
+            port: 80
             scheme: HTTP
           initialDelaySeconds: 90
           periodSeconds: 20
@@ -65,14 +65,14 @@ spec:
           timeoutSeconds: 10
         name: authservice-v1
         ports:
-        - containerPort: 8899
+        - containerPort: 80
           name: http
           protocol: TCP
         readinessProbe:
           failureThreshold: 5
           httpGet:
             path: /health
-            port: 8899
+            port: 80
             scheme: HTTP
           initialDelaySeconds: 90
           periodSeconds: 20
